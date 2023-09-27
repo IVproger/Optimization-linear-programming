@@ -21,7 +21,8 @@ public class MatrixFactory {
         return null;
     }
 
-    public static Matrix createMatrixFromInput() {
+    /* нужно передавать размеры матрицы в этот метод. Чтобы они у меня были как кол-во переменных и кострейнтов*/
+    public static Matrix createMatrixFromInput(int rows, int cols) {
         return null;
     }
 }

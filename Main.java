@@ -7,7 +7,8 @@ public class Main {
 
         // Example
 
-        Matrix A = MatrixFactory.createMatrixFromInput();
+        Matrix A = MatrixFactory.createMatrixFromInput(3, 2);
         System.out.println(A.getInverse());
     }
 }
+
