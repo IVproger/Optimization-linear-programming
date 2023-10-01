@@ -9,8 +9,10 @@ public interface Matrix {
     Vector multiplyByVector(Vector vector); // as a column vector
 
     Matrix getTransposed();
-    Matrix getInverse();
-    double getDeterminant();
+
+    // Убрал эти методы в класс Inverser, потому что они очень большие
+    // Matrix getInverse();
+    // double getDeterminant();
 
     double getItem(int row, int col);
     Vector getRow(int row);
