@@ -1,5 +1,6 @@
 package structures.implementations;
 
+import structures.Matrix;
 import structures.Vector;
 
 import java.util.Iterator;
@@ -56,6 +57,25 @@ public class ArrayVector implements Vector {
 
         for (int i = 0; i < this.length; i++)
             result += this.values[i] * vector.getItem(i);
+
+        return result;
+    }
+
+    @Override
+    public Vector multiply(Matrix matrix) {
+        if (this.length != matrix.getNumberOfRows())
+            throw new IllegalArgumentException();
+
+        Vector result = new ArrayVector(matrix.getNumberOfColumns());
+
+        for (int i = 0; i < matrix.getNumberOfColumns(); i++) {
+            double sum = 0;
+
+            for (int j = 0; j < this.length; j++)
+                sum += this.values[j] * matrix.getItem(j, i);
+
+            result.setItem(i, sum);
+        }
 
         return result;
     }
