@@ -16,7 +16,7 @@ public class Inverser {
             for (int j = 0; j < matrix.getNumberOfColumns(); j++) {
                 Matrix submatrix = calculateSubMatrixExcluding(matrix, i, j);
                 double subDeterminant = calculateDeterminant(submatrix);
-                inverse.setItem(i, j, Math.pow(-1, i + j) * subDeterminant / determinant);
+                inverse.setItem(j, i, Math.pow(-1, i + j) * subDeterminant / determinant);
             }
         }
 

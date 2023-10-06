@@ -12,4 +12,5 @@ public interface Vector extends Iterable<Double> {
     void setItem(int index, double value);
 
     int getLength();
+
 }
