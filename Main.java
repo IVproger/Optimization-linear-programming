@@ -9,39 +9,53 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Simplex simplex = input();
+        if (simplex == null) return;
+
         if (simplex.checkApplicability() != 1) {
             simplex.iteration0();
             simplex.goRevisedSimplex();
         }
     }
 
-    public static Simplex input() {
+    private static Simplex input() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Do we need to maximize or minimize function? Enter \"max\" or \"min\" without quotation marks");
-        String opt = scanner.nextLine();
-        System.out.println("Enter the number of variables");
-        int n = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter the number of constraints");
-        int m = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter a vector of coefficients of objective function - c.");
-        Vector c = VectorFactory.createVectorFromInput(n, scanner);
-        System.out.println("Enter a matrix of coefficients of constraint function - A.");
-        Matrix A = MatrixFactory.createMatrixFromInput(m, n, scanner);
-        System.out.println("Enter a vector of right-hand side numbers - b.");
-        Vector b = VectorFactory.createVectorFromInput(m, scanner);
-        System.out.println("Enter an approximation accuracy - epsilon.");
-        double e = scanner.nextDouble();
 
-        Simplex simplex = Simplex.builder()
-                .setOptimize(opt)
-                .setNumberOfVariablesN(n)
-                .setNumberOfConstraintsM(m)
-                .setVectorC(c)
-                .setMatrixA(A)
-                .setVectorB(b)
-                .setEpsilon(e)
-                .build();
-        return simplex;
+        try {
+            System.out.println("Do we need to maximize or minimize function? Enter \"max\" or \"min\" without quotation marks");
+            String opt = scanner.nextLine().toLowerCase();
+            if (!opt.equals("max") && !opt.equals("min"))
+                throw new Exception();
+
+            System.out.println("Enter the number of variables");
+            int n = Integer.parseInt(scanner.nextLine());
+            System.out.println("Enter the number of constraints");
+            int m = Integer.parseInt(scanner.nextLine());
+
+            System.out.println("Enter a vector of coefficients of objective function - c.");
+            Vector c = VectorFactory.createVectorFromInput(n, scanner);
+            System.out.println("Enter a matrix of coefficients of constraint function - A.");
+            Matrix A = MatrixFactory.createMatrixFromInput(m, n, scanner);
+            System.out.println("Enter a vector of right-hand side numbers - b.");
+            Vector b = VectorFactory.createVectorFromInput(m, scanner);
+
+            System.out.println("Enter an approximation accuracy - epsilon.");
+            double e = scanner.nextDouble();
+
+            Simplex simplex = Simplex.builder()
+                    .setOptimize(opt)
+                    .setNumberOfVariablesN(n)
+                    .setNumberOfConstraintsM(m)
+                    .setVectorC(c)
+                    .setMatrixA(A)
+                    .setVectorB(b)
+                    .setEpsilon(e)
+                    .build();
+
+            return simplex;
+        } catch (Exception ex) {
+            System.out.println("Wrong input!");
+            return null;
+        }
     }
 
 }
