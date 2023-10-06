@@ -39,9 +39,9 @@ public class Main {
             Vector b = VectorFactory.createVectorFromInput(m, scanner);
 
             System.out.println("Enter an approximation accuracy - epsilon.");
-            double e = scanner.nextDouble();
+            String e = scanner.next();
 
-            Simplex simplex = Simplex.builder()
+            return Simplex.builder()
                     .setOptimize(opt)
                     .setNumberOfVariablesN(n)
                     .setNumberOfConstraintsM(m)
@@ -50,8 +50,6 @@ public class Main {
                     .setVectorB(b)
                     .setEpsilon(e)
                     .build();
-
-            return simplex;
         } catch (Exception ex) {
             System.out.println("Wrong input!");
             return null;
