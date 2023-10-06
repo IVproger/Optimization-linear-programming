@@ -67,7 +67,7 @@ class Simplex {
     Vector c; // (N)
     Matrix A; // (M*N)
     Vector b; // (M)
-    double epsilon; // approximation accuracy
+    String epsilon; // approximation accuracy
     Vector basisIndexes;
     Vector cBasis;
     Vector xBasis;
@@ -83,7 +83,7 @@ class Simplex {
         optimize = "MAX";
         numberOfVariablesN = 0;
         numberOfConstraintsM = 0;
-        epsilon = 0;
+        epsilon = "";
     }
 
     int checkApplicability() {
@@ -165,10 +165,20 @@ class Simplex {
             xSolution.setItem((int) basisIndexes.getItem(i), xBasis.getItem(i));
         }
         System.out.print("A vector of decision variables - x* = {");
+        int signs = 0;
+        boolean afterComma = false;
+        for (int i = 0; i < epsilon.length(); i++) {
+            if (epsilon.charAt(i) == '.' || epsilon.charAt(i) == ',') {
+                afterComma = true;
+            }
+            if (afterComma && epsilon.charAt(i) >= '0' && epsilon.charAt(i) <= '9') {
+                signs++;
+            }
+        }
+        String approximation = "%." + signs + "f ";
         for (double x : xSolution
         ) {
-
-            System.out.print(x + " ");
+            System.out.printf(approximation, x);
         }
         System.out.println("}");
         if (optimize.equalsIgnoreCase("max")) {
@@ -177,7 +187,7 @@ class Simplex {
         if (optimize.equalsIgnoreCase("min")) {
             System.out.print("Minimum ");
         }
-        System.out.println("value of the objective function " + solution);
+        System.out.printf("value of the objective function " + approximation, solution);
     }
 
     void setNonBasicVariables() {
@@ -233,7 +243,7 @@ class Simplex {
         } else if (optimize.equalsIgnoreCase("min")) {
             enteringVector = maxPositiveItemIndex(zRow);
         }
-        if(enteringVector==-1){
+        if (enteringVector == -1) {
             return enteringVector;
         }
         return (int) nonBasicIndexes.getItem(enteringVector);
@@ -257,7 +267,7 @@ class Simplex {
                 res = i;
             }
         }
-        if(res==-1){
+        if (res == -1) {
             return res;
         }
         return (int) basisIndexes.getItem(res);
@@ -266,7 +276,7 @@ class Simplex {
     void changeBasis(int leaving, int entering) {
         int indLeaving = 0;
         for (int i = 0; i < basisIndexes.getLength(); i++) {
-            if(basisIndexes.getItem(i)==leaving){
+            if (basisIndexes.getItem(i) == leaving) {
                 indLeaving = i;
                 break;
             }
@@ -284,7 +294,7 @@ class Simplex {
         private Vector c; // (N)
         private Matrix A; // (M*N)
         private Vector b; // (M)
-        private double epsilon; // approximation accuracy
+        private String epsilon; // approximation accuracy
 
         Builder setOptimize(String optimize) {
             this.optimize = optimize;
@@ -316,7 +326,7 @@ class Simplex {
             return this;
         }
 
-        Builder setEpsilon(double e) {
+        Builder setEpsilon(String e) {
             this.epsilon = e;
             return this;
         }
