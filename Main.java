@@ -85,6 +85,19 @@ class Simplex {
     }
 
     int checkApplicability() {
+        int zerosInC = 0;
+        for (int i = 0; i < cBasis.getLength(); i++) {
+            if(cBasis.getItem(i) != 0){
+                break;
+            }
+            if(cBasis.getItem(i) == 0){
+                zerosInC++;
+            }
+        }
+        if(zerosInC == cBasis.getLength()){
+            System.out.println("The method is not applicable!");
+            return 1;
+        }
         for (int i = 0; i < b.getLength(); i++) {
             if (b.getItem(i) < 0) {
                 System.out.println("The method is not applicable!");
