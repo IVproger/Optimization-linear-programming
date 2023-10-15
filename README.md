@@ -151,7 +151,7 @@ You can test our code in Live on replit platform: https://replit.com/@AndrewLeva
 - 0.001
 
 **Output:**
-A vector of decision variables - X* =
+- A vector of decision variables - X* =
   [
   0.000
   0.000
@@ -160,4 +160,4 @@ A vector of decision variables - X* =
   2.000
   0.000
   ]
-Minimum value of the objective function: -64.000
+- Minimum value of the objective function: -64.000
