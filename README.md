@@ -4,31 +4,68 @@ You can test our code in Live on replit platform: https://replit.com/@AndrewLeva
 
 ## Test №1
 **Objective:**
-- max
+- min
 
 **Number of Variables:**
-- 3
+- 5
 
 **Number of Constraints:**
-- 1
+- 3
 
 **Objective Function Coefficients - c:**
-- 25
-- 40
-- 0
+- 0 0 0 0 0
 
 **Constraint Matrix - A:**
-- 1
-- -1
-- 1
+- 3 2 1 0 0
+- 2 1 0 1 0
+- 5 3 0 0 1
 
 **Right-hand Side Vector - b:**
-- 0
+- 30
+- 40
+- 50
 
-**Approximation accuracy - epsilon:**
+**Approximation accuracy - ε:**
 - 0.001
 
 **Output:**
 - The method is not applicable!
 
+## Test №2
+**Objective:**
+- max
+
+**Number of Variables:**
+- 6
+
+**Number of Constraints:**
+- 3
+
+**Objective Function Coefficients - c:**
+- 2 3 0 -1 0 0
+
+**Constraint Matrix - A:**
+- 2 -1 0 -2 1 0
+- 3 2 1 -3 0 0
+- -1 3 0 4 0 1
+
+**Right-hand Side Vector - b:**
+- 16
+- 18
+- 24
+
+**Approximation accuracy - epsilon:**
+- 0.001
+
+**Output:**
+- A vector of decision variables - X* =
+  [
+  0.545
+  8.182
+  0.000
+  0.000
+  23.091
+  0.000
+  ]
+- Maximum value of the objective function: 25.636
 
