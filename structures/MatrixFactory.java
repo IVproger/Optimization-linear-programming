@@ -52,8 +52,6 @@ public class MatrixFactory {
         return result;
     }
 
-    /* нужно передавать размеры матрицы в этот метод. Чтобы они у меня были как кол-во переменных и кострейнтов*/
-    // Тут мне нужен будет ещё Scanner, чтобы считывать с консоли
     public static Matrix createMatrixFromInput(int rows, int cols, Scanner scanner) {
         Matrix matrix = new ArrayMatrix(rows, cols);
 

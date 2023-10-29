@@ -103,7 +103,7 @@ public class ArrayVector implements Vector {
 
     @Override
     public Iterator<Double> iterator() {
-        return new Iterator<>() {
+        return new Iterator<Double>() {
             private int index = 0;
 
             @Override
@@ -125,6 +125,11 @@ public class ArrayVector implements Vector {
         System.out.println();
     }
 
+    /**
+     * Checks if two vectors are equal
+     * @param other is the second vector
+     * @return true if they are equal, false otherwise
+     */
     @Override
     public boolean equals(Vector other) {
         if (this.length != other.getLength())
@@ -137,6 +142,10 @@ public class ArrayVector implements Vector {
         return true;
     }
 
+    /**
+     * Method calculates the norm of vector
+     * @return the norm
+     */
     @Override
     public double getNorm() {
         double sum = 0;
@@ -147,6 +156,10 @@ public class ArrayVector implements Vector {
         return Math.sqrt(sum);
     }
 
+    /**
+     * Method counts number of zeros in the vector
+     * @return amount of 0s
+     */
     @Override
     public int getNumberOfZeroElements() {
         int count = 0;
@@ -158,6 +171,10 @@ public class ArrayVector implements Vector {
         return count;
     }
 
+    /**
+     * Method determines the minimal element in the vector
+     * @return minimal element
+     */
     @Override
     public double findMinValue() {
         double min = 1000000000;

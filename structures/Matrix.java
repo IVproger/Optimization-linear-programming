@@ -6,13 +6,9 @@ public interface Matrix {
 
     Matrix scalarMultiply(double scalar);
     Matrix multiply(Matrix other);
-    Vector multiplyByVector(Vector vector); // as a column vector
+    Vector multiplyByVector(Vector vector);
 
     Matrix getTransposed();
-
-    // Убрал эти методы в класс Inverser, потому что они очень большие
-    // Matrix getInverse();
-    // double getDeterminant();
 
     double getItem(int row, int col);
     Vector getRow(int row);
@@ -29,5 +25,4 @@ public interface Matrix {
 
     void seatDiagonal(Vector vector);
 
-    Matrix transpose();
 }

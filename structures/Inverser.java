@@ -3,6 +3,11 @@ package structures;
 import structures.implementations.ArrayMatrix;
 
 public class Inverser {
+    /**
+     * Method for calculating the inverse of a matrix
+     * @param matrix is the source matrix
+     * @return the inverse matrix
+     */
     public static Matrix calculateInverse(Matrix matrix) {
         if (matrix.getNumberOfRows() != matrix.getNumberOfColumns())
             throw new IllegalArgumentException("Matrix must be square to calculate inverse");
@@ -23,6 +28,11 @@ public class Inverser {
         return inverse;
     }
 
+    /**
+     * Method for calculating the matrix determinant
+     * @param matrix is the source matrix
+     * @return the determinant
+     */
     public static double calculateDeterminant(Matrix matrix) {
         if (matrix.getNumberOfRows() != matrix.getNumberOfColumns())
             throw new IllegalArgumentException("Matrix must be square to calculate determinant");
@@ -40,6 +50,13 @@ public class Inverser {
         return determinant;
     }
 
+    /**
+     * Method for constructing a new matrix from an old one without a row and a column
+     * @param matrix is the source matrix
+     * @param row is the row to be excluded
+     * @param column is the column to be excluded
+     * @return new matrix
+     */
     public static Matrix calculateSubMatrixExcluding(Matrix matrix, int row, int column) {
         Matrix submatrix = new ArrayMatrix(matrix.getNumberOfRows() - 1, matrix.getNumberOfColumns() - 1);
 

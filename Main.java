@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 interface Algorithm {
 
 }
@@ -17,11 +16,13 @@ interface Algorithm {
 public class Main {
     public static void main(String[] args) {
         ArrayList<Algorithm> algorithms = input();
-        if(algorithms == null) return;
+        if (algorithms == null) return;
+
         Simplex simplex = (Simplex) algorithms.get(0);
         InteriorPoint interiorPoint = (InteriorPoint) algorithms.get(1);
         interiorPoint.setStartingPoint();
 
+        //Solving the problem using Simplex algorithm
         System.out.print("\n");
         System.out.println("Simplex method algorithm: ");
         if (simplex == null) return;
@@ -30,11 +31,11 @@ public class Main {
             simplex.goRevisedSimplex();
         }
 
+        //Solving the problem using Interior Point algorithm
         System.out.print("\n");
         System.out.println("Interior Point algorithms: ");
-        if(interiorPoint.checkApplicability()){
-            interiorPoint.solveAlpha1();
-            interiorPoint.solveAlpha2();
+        if (interiorPoint.checkApplicability()) {
+            interiorPoint.solve();
         }
     }
 
@@ -42,6 +43,7 @@ public class Main {
         ArrayList<Algorithm> algorithms = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
+        //Reading the input data
         try {
             System.out.println("Do we need to maximize or minimize function? Enter \"max\" or \"min\" without quotation marks");
             String opt = scanner.nextLine().toLowerCase();
@@ -63,7 +65,7 @@ public class Main {
             System.out.println("Enter an approximation accuracy - epsilon.");
             String e = scanner.next();
 
-
+            //Initializing data for Simplex algorithm
             algorithms.add(Simplex.builder()
                     .setOptimize(opt)
                     .setNumberOfVariablesN(n)
@@ -73,7 +75,7 @@ public class Main {
                     .setVectorB(b)
                     .setEpsilon(e)
                     .build());
-
+            //Initializing data for Interior Point algorithm
             algorithms.add(InteriorPoint.builder()
                     .setOptimize(opt)
                     .setNumberOfVariablesN(n)
@@ -84,7 +86,6 @@ public class Main {
                     .setEpsilon(e)
                     .build());
 
-
             return algorithms;
         } catch (Exception ex) {
             System.out.println("Wrong input!");
@@ -94,13 +95,16 @@ public class Main {
 
 }
 
+/**
+ * Simplex method class
+ */
 class Simplex implements Algorithm {
     String optimize; // MAX or MIN
     int numberOfVariablesN;
     int numberOfConstraintsM;
-    Vector c; // (N)
-    Matrix A; // (M*N)
-    Vector b; // (M)
+    Vector c; // a vector of coefficients of objective function
+    Matrix A; // a matrix of coefficients of constraint function
+    Vector b; // a vector of right-hand side numbers
     String epsilon; // approximation accuracy
     Vector basisIndexes;
     Vector cBasis;
@@ -120,7 +124,12 @@ class Simplex implements Algorithm {
         epsilon = "";
     }
 
+    /**
+     * Method checks whether the Simplex method is applicable
+     * @return 1 if not applicable, 0 otherwise
+     */
     int checkApplicability() {
+        //Checking if a vector of coefficients of objective function contains all zeros
         int zerosInC = 0;
         for (int i = 0; i < c.getLength(); i++) {
             if (c.getItem(i) != 0) {
@@ -134,12 +143,14 @@ class Simplex implements Algorithm {
             System.out.println("The method is not applicable!");
             return 1;
         }
+        //Checking if a vector of right-hand side numbers contains negative elements
         for (int i = 0; i < b.getLength(); i++) {
             if (b.getItem(i) < 0) {
                 System.out.println("The method is not applicable!");
                 return 1;
             }
         }
+        //Checking if a matrix A contains an identity matrix
         Vector basis = getBasis();
         if (basis != null) {
             basisIndexes = basis;
@@ -149,7 +160,10 @@ class Simplex implements Algorithm {
         return 1;
     }
 
-    // check if the matrix A contains Identity matrix and if so returns basis vector (indexes)
+    /**
+     * Method check if the matrix A contains Identity matrix and if so returns basis vector
+     * @return basis vector
+     */
     Vector getBasis() {
         Vector basis = VectorFactory.createEmptyVector(numberOfConstraintsM);
         int basicVectors = 0;
@@ -178,6 +192,9 @@ class Simplex implements Algorithm {
         return null;
     }
 
+    /**
+     * Creates matrix B, its inverse and vector c on iteration 0
+     */
     void iteration0() {
         cBasis = VectorFactory.createEmptyVector(basisIndexes.getLength());
         B = MatrixFactory.createEmptyMatrix(basisIndexes.getLength(), basisIndexes.getLength());
@@ -188,6 +205,9 @@ class Simplex implements Algorithm {
         BInverse = Inverser.calculateInverse(B);
     }
 
+    /**
+     * Method for Revised Simplex algorithm
+     */
     void goRevisedSimplex() {
         int enteringVector = 0;
         int leavingVector;
@@ -224,8 +244,7 @@ class Simplex implements Algorithm {
             }
         }
         String approximation = "%." + signs + "f ";
-        for (double x : xSolution
-        ) {
+        for (double x : xSolution) {
             System.out.printf(approximation, x);
         }
         System.out.println("}");
@@ -240,6 +259,9 @@ class Simplex implements Algorithm {
 
     }
 
+    /**
+     * Method for finding non-basic variables
+     */
     void setNonBasicVariables() {
         nonBasicVectors = MatrixFactory.createEmptyMatrix(numberOfConstraintsM, numberOfVariablesN - basisIndexes.getLength());
         cNonBasic = VectorFactory.createEmptyVector(numberOfVariablesN - basisIndexes.getLength());
@@ -262,6 +284,9 @@ class Simplex implements Algorithm {
         }
     }
 
+    /**
+     * Method finds the maximum positive element in a vector
+     */
     int maxPositiveItemIndex(Vector vector) {
         int res = -1;
         double max = 0;
@@ -274,6 +299,9 @@ class Simplex implements Algorithm {
         return res;
     }
 
+    /**
+     * Method finds the minimal negative element in a vector
+     */
     int minNegativeItemIndex(Vector vector) {
         int res = -1;
         double min = 0;
@@ -286,6 +314,9 @@ class Simplex implements Algorithm {
         return res;
     }
 
+    /**
+     * Finds minimal negative or maximum positive (for maximization or minimization problems), determines the new variable to enter
+     */
     int optimalityComputations() {
         int enteringVector = -1;
         if (optimize.equalsIgnoreCase("max")) {
@@ -299,6 +330,9 @@ class Simplex implements Algorithm {
         return (int) nonBasicIndexes.getItem(enteringVector);
     }
 
+    /**
+     * Determines the new variable to leave
+     */
     int feasibilityComputations(int entVector) {
         Vector BInvPEnt = BInverse.multiplyByVector(A.getColumn(entVector));
         Vector ratio = VectorFactory.createEmptyVector(A.getNumberOfRows());
@@ -323,6 +357,9 @@ class Simplex implements Algorithm {
         return (int) basisIndexes.getItem(res);
     }
 
+    /**
+     * Changing basis for new entering variable
+     */
     void changeBasis(int leaving, int entering) {
         int indLeaving = 0;
         for (int i = 0; i < basisIndexes.getLength(); i++) {
@@ -337,13 +374,16 @@ class Simplex implements Algorithm {
         BInverse = Inverser.calculateInverse(B);
     }
 
+    /**
+     * Simplex builder
+     */
     public static class Builder {
         private String optimize; // MAX or MIN
         private int numberOfVariablesN;
         private int numberOfConstraintsM;
-        private Vector c; // (N)
-        private Matrix A; // (M*N)
-        private Vector b; // (M)
+        private Vector c;
+        private Matrix A;
+        private Vector b;
         private String epsilon; // approximation accuracy
 
         Builder setOptimize(String optimize) {
@@ -399,13 +439,16 @@ class Simplex implements Algorithm {
     }
 }
 
+/**
+ * Interior Point algorithm
+ */
 class InteriorPoint implements Algorithm {
     String optimize; // MAX or MIN
     int numberOfVariablesN;
     int numberOfConstraintsM;
-    Vector c; // (N)
-    Matrix A; // (M*N)
-    Vector b; // (M)
+    Vector c; // a vector of coefficients of objective function
+    Matrix A; // a matrix of coefficients of constraint function
+    Vector b; // a vector of right-hand side numbers
     String epsilon; // approximation accuracy
 
     Vector startingPoint;
@@ -413,7 +456,6 @@ class InteriorPoint implements Algorithm {
     Vector startingPoint1;
 
     double alpha1 = 0.5;
-
     double alpha2 = 0.9;
 
     public InteriorPoint() {
@@ -429,19 +471,25 @@ class InteriorPoint implements Algorithm {
         this.startingPoint = VectorFactory.createVectorFromInput(numberOfVariablesN, scanner);
         this.startingPoint1 = startingPoint;
 
-        for(int i = 0; i < startingPoint.getLength(); i++){
-            if(startingPoint.getItem(i) < 0){
+        for (int i = 0; i < startingPoint.getLength(); i++) {
+            if (startingPoint.getItem(i) < 0) {
                 System.out.println("The starting point is incorrect! The method is not applicable!");
                 System.exit(0);
             }
         }
     }
 
+    /**
+     * Method checks algorithm applicability
+     * @return true if applicable, false otherwise
+     */
     public boolean checkApplicability() {
+        //Checking if a vector of coefficients of objective function contains all zeros
         if (c.getNumberOfZeroElements() == c.getLength()) {
             System.out.println("The method is not applicable!");
             return false;
         }
+        //Checking if a vector of right-hand side numbers contains negative elements
         for (int i = 0; i < b.getLength(); i++) {
             if (b.getItem(i) < 0) {
                 System.out.println("The method is not applicable!");
@@ -451,8 +499,21 @@ class InteriorPoint implements Algorithm {
         return true;
     }
 
-    public void solveAlpha1() {
-        if (optimize.equals("MIN") || optimize.equals("min")) {
+    /**
+     * Solving problem for different alphas
+     */
+    public void solve() {
+        solveAlpha(alpha1);
+        System.out.println();
+        solveAlpha(alpha2);
+    }
+
+    /**
+     * Interior point algorithm for specific alpha
+     */
+    public void solveAlpha(double alpha) {
+        //Change vector c if it is a minimization problem
+        if (optimize.equalsIgnoreCase("min")) {
             c = c.scalarMultiply(-1);
         }
 
@@ -465,7 +526,7 @@ class InteriorPoint implements Algorithm {
 
                 Matrix Anew = A.multiply(D);
 
-                Matrix AnewT = Anew.transpose();
+                Matrix AnewT = Anew.getTransposed();
 
                 Vector Cnew = D.multiplyByVector(c);
 
@@ -485,14 +546,14 @@ class InteriorPoint implements Algorithm {
 
                 Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
 
-                Vector result = ones.plus(cp.scalarMultiply(alpha1 / nu));
+                Vector result = ones.plus(cp.scalarMultiply(alpha / nu));
 
                 result = D.multiplyByVector(result);
 
                 startingPoint = result;
 
                 iteration++;
-                if(iteration == 1000){
+                if (iteration == 1000) {
                     System.out.println("The problem does not have solution! OR The starting point is incorrect!");
                     System.exit(0);
                 }
@@ -505,7 +566,7 @@ class InteriorPoint implements Algorithm {
                 return;
             }
         }
-        System.out.println("The solution by Interior Point method Algorithm with alpha1 = 0.5:");
+        System.out.println("The solution by Interior Point method Algorithm with alpha = " + alpha + ":");
         int signs = 0;
         boolean afterComma = false;
         for (int i = 0; i < epsilon.length(); i++) {
@@ -518,8 +579,7 @@ class InteriorPoint implements Algorithm {
         }
         String approximation = "%." + signs + "f ";
         System.out.printf("In the last iteration " + iteration + " we have x* = { ");
-        for (double x : startingPoint
-        ) {
+        for (double x : startingPoint) {
             System.out.printf(approximation, x);
         }
         System.out.println("}");
@@ -534,86 +594,9 @@ class InteriorPoint implements Algorithm {
         System.out.println();
     }
 
-    public void solveAlpha2() {
-        int iteration = 0;
-        while (true) {
-            try {
-                Vector temp = startingPoint1;
-                Matrix D = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
-                D.seatDiagonal(startingPoint1);
-
-                Matrix Anew = A.multiply(D);
-
-                Matrix AnewT = Anew.transpose();
-
-                Vector Cnew = D.multiplyByVector(c);
-
-                Matrix I = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
-
-                Matrix F = Anew.multiply(AnewT);
-
-                Matrix FI = Inverser.calculateInverse(F);
-
-                Matrix H = AnewT.multiply(FI);
-
-                Matrix P = I.minus(H.multiply(Anew));
-
-                Vector cp = P.multiplyByVector(Cnew);
-
-                double nu = Math.abs(cp.findMinValue());
-
-                Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
-
-                Vector result = ones.plus(cp.scalarMultiply(alpha2 / nu));
-
-                result = D.multiplyByVector(result);
-
-                startingPoint1 = result;
-
-                iteration++;
-                if(iteration == 1000){
-                    System.out.println("The problem does not have solution! OR The starting point is incorrect!");
-                    System.exit(0);
-                }
-
-                if (result.minus(temp).getNorm() < Double.parseDouble(epsilon)) {
-                    break;
-                }
-            } catch (Exception ex) {
-                System.out.println("The problem does not have solution! OR The starting point is incorrect!");
-                return;
-            }
-        }
-        System.out.println("The solution by Interior Point method Algorithm with alpha = 0.9:");
-        int signs = 0;
-        boolean afterComma = false;
-        for (int i = 0; i < epsilon.length(); i++) {
-            if (epsilon.charAt(i) == '.' || epsilon.charAt(i) == ',') {
-                afterComma = true;
-            }
-            if (afterComma && epsilon.charAt(i) >= '0' && epsilon.charAt(i) <= '9') {
-                signs++;
-            }
-        }
-        String approximation = "%." + signs + "f ";
-        System.out.printf("In the last iteration " + iteration + " we have x* = { ");
-        for (double x : startingPoint1
-        ) {
-            System.out.printf(approximation, x);
-        }
-        System.out.println("}");
-        // Calculate the solution
-        if (optimize.equalsIgnoreCase("max")) {
-            System.out.print("Maximum ");
-        }
-        if (optimize.equalsIgnoreCase("min")) {
-            System.out.print("Minimum ");
-        }
-        System.out.printf("value of the objective function " + approximation, c.dotProduct(startingPoint1));
-        System.out.println();
-    }
-
-
+    /**
+     * Interior point builder
+     */
     public static class Builder {
         private String optimize; // MAX or MIN
         private int numberOfVariablesN;

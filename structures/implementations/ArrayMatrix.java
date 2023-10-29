@@ -3,11 +3,19 @@ package structures.implementations;
 import structures.Matrix;
 import structures.Vector;
 
+/**
+ * Class of Matrices
+ */
 public class ArrayMatrix implements Matrix {
     private final int rows;
     private final int cols;
     private final double[][] values;
 
+    /**
+     * Matrix constructor (sets all elements to 0)
+     * @param rows number of rows
+     * @param cols number of columns
+     */
     public ArrayMatrix(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
@@ -18,6 +26,11 @@ public class ArrayMatrix implements Matrix {
                 this.values[i][j] = 0;
     }
 
+    /**
+     * Function for adding two matrices
+     * @param other is a matrix which is to be added to source matrix
+     * @return new matrix which is a result of addition
+     */
     @Override
     public Matrix plus(Matrix other) {
         if (this.rows != other.getNumberOfRows() || this.cols != other.getNumberOfColumns())
@@ -32,6 +45,11 @@ public class ArrayMatrix implements Matrix {
         return result;
     }
 
+    /**
+     * Function for subtracting one matrix for another
+     * @param other is a matrix which is to be subtracted from source matrix
+     * @return new matrix which is a result of subtraction
+     */
     @Override
     public Matrix minus(Matrix other) {
         if (this.rows != other.getNumberOfRows() || this.cols != other.getNumberOfColumns())
@@ -40,6 +58,11 @@ public class ArrayMatrix implements Matrix {
         return this.plus(other.scalarMultiply(-1));
     }
 
+    /**
+     * Function for multiplying a matrix by a scalar
+     * @param scalar is a scalar by which matrix is to be multiplied
+     * @return result of scalar multiplication
+     */
     @Override
     public Matrix scalarMultiply(double scalar) {
         Matrix result = new ArrayMatrix(this.rows, this.cols);
@@ -51,6 +74,11 @@ public class ArrayMatrix implements Matrix {
         return result;
     }
 
+    /**
+     * Function for multiplying a matrix by another matrix
+     * @param other is a matrix by which source matrix is to be multiplied
+     * @return result of matrix multiplication
+     */
     @Override
     public Matrix multiply(Matrix other) {
         if (this.cols != other.getNumberOfRows())
@@ -66,6 +94,11 @@ public class ArrayMatrix implements Matrix {
         return result;
     }
 
+    /**
+     * Function for multiplying a matrix by vector
+     * @param vector is a vector by which source matrix is to be multiplied
+     * @return result of multiplication
+     */
     @Override
     public Vector multiplyByVector(Vector vector) {
         if (this.cols != vector.getLength())
@@ -81,6 +114,10 @@ public class ArrayMatrix implements Matrix {
         return result;
     }
 
+    /**
+     * Function for matrix transposition
+     * @return transposed matrix
+     */
     @Override
     public Matrix getTransposed() {
         Matrix result = new ArrayMatrix(this.cols, this.rows);
@@ -92,6 +129,12 @@ public class ArrayMatrix implements Matrix {
         return result;
     }
 
+    /**
+     * Method for accessing a specific element of a matrix
+     * @param row is a row position of the element
+     * @param col is a column position of the element
+     * @return the specific element
+     */
     @Override
     public double getItem(int row, int col) {
         if (row >= this.rows || col >= this.cols || row < 0 || col < 0)
@@ -180,6 +223,10 @@ public class ArrayMatrix implements Matrix {
         }
     }
 
+    /**
+     * Method for changing an identity matrix D for it to contain current point as its diagonal
+     * @param vector current point coordinates
+     */
     @Override
     public void seatDiagonal(Vector vector) {
         if (vector.getLength() != this.rows)
@@ -188,18 +235,4 @@ public class ArrayMatrix implements Matrix {
         for (int i = 0; i < this.rows; i++)
             this.values[i][i] = vector.getItem(i);
     }
-
-    @Override
-    public Matrix transpose() {
-        Matrix result = new ArrayMatrix(this.cols, this.rows);
-
-        for (int i = 0; i < this.cols; i++)
-            for (int j = 0; j < this.rows; j++)
-                result.setItem(i, j, this.values[j][i]);
-
-        return result;
-    }
-
-
-
 }
