@@ -4,6 +4,7 @@ import structures.Vector;
 import structures.Matrix;
 import structures.Inverser;
 
+import java.nio.file.SecureDirectoryStream;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -15,82 +16,26 @@ interface Algorithm {
 
 public class Main {
     public static void main(String[] args) {
-//        ArrayList<Algorithm> algorithms = input();
-//        if(algorithms == null) return;
-//        Simplex simplex = (Simplex) algorithms.get(0);
-//        InteriorPoint interiorPoint = (InteriorPoint) algorithms.get(1);
-//
-//        if (simplex == null) return;
-//        if (simplex.checkApplicability() != 1) {
-//            simplex.iteration0();
-//            simplex.goRevisedSimplex();
-//        }
+        ArrayList<Algorithm> algorithms = input();
+        if(algorithms == null) return;
+        Simplex simplex = (Simplex) algorithms.get(0);
+        InteriorPoint interiorPoint = (InteriorPoint) algorithms.get(1);
+        interiorPoint.setStartingPoint();
 
-        // TODO check the methods applicability and if they are applicable, then solve the problem
-        // TODO find algorithm to find the starting point for Interior Point method
-        // TODO clean code and add comments
-        // TODO push into GitHub
-        // TODO add README.md
+        System.out.print("\n");
+        System.out.println("Simplex method algorithm: ");
+        if (simplex == null) return;
+        if (simplex.checkApplicability() != 1) {
+            simplex.iteration0();
+            simplex.goRevisedSimplex();
+        }
 
-
-        // Test 1
-        InteriorPoint interiorPoint = InteriorPoint.builder()
-                .setOptimize("max")
-                .setNumberOfVariablesN(6)
-                .setNumberOfConstraintsM(3)
-                .setVectorC(VectorFactory.createVector(new double[]{9, 10, 16, 0, 0, 0}))
-                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{18, 15, 12, 1, 0, 0}, {6, 4, 8, 0, 1, 0}, {5, 3, 3, 0, 0, 1}}))
-                .setVectorB(VectorFactory.createVector(new double[]{360, 192, 180}))
-                .setEpsilon("0.0001")
-                .build();
-
-//        interiorPoint.setStartingPoint(new double[]{1, 1, 1, 315, 174, 169});
-        interiorPoint.getStartingPoint();
-        interiorPoint.startingPoint.print();
-
-
-
-
-
-//        interiorPoint.solve();
-//
-//        System.out.println("\n\n");
-//        Simplex simplex = Simplex.builder()
-//                .setOptimize("max")
-//                .setNumberOfVariablesN(6)
-//                .setNumberOfConstraintsM(3)
-//                .setVectorC(VectorFactory.createVector(new double[]{9, 10, 16, 0, 0, 0}))
-//                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{18, 15, 12, 1, 0, 0}, {6, 4, 8, 0, 1, 0}, {5, 3, 3, 0, 0, 1}}))
-//                .setVectorB(VectorFactory.createVector(new double[]{360, 192, 180}))
-//                .setEpsilon("0.0001")
-//                .build();
-//        if (simplex == null) return;
-//        if (simplex.checkApplicability() != 1) {
-//            simplex.iteration0();
-//            simplex.goRevisedSimplex();
-//        }
-
-
-
-
-
-
-        // Test 2
-//        InteriorPoint interiorPoint = InteriorPoint.builder()
-//                .setOptimize("max")
-//                .setNumberOfVariablesN(4)
-//                .setNumberOfConstraintsM(2)
-//                .setVectorC(VectorFactory.createVector(new double[]{1, 1, 0, 0}))
-//                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{2, 4, 1, 0}, {1, 3, 0, -1}}))
-//                .setVectorB(VectorFactory.createVector(new double[]{16, 9}))
-//                .setEpsilon("0.0001")
-//                .build();
-//
-//        interiorPoint.setStartingPoint(new double[]{0.5, 3.5, 1, 2});
-//
-//        interiorPoint.solve();
-
-
+        System.out.print("\n");
+        System.out.println("Interior Point algorithms: ");
+        if(interiorPoint.checkApplicability()){
+            interiorPoint.solveAlpha1();
+            interiorPoint.solveAlpha2();
+        }
     }
 
     private static ArrayList<Algorithm> input() {
@@ -267,7 +212,7 @@ class Simplex implements Algorithm {
             xSolution.setItem((int) basisIndexes.getItem(i), xBasis.getItem(i));
         }
         System.out.println("The solution by Simplex method Algorithm:");
-        System.out.print("A vector of decision variables - x* = {");
+        System.out.print("A vector of decision variables - x* = { ");
         int signs = 0;
         boolean afterComma = false;
         for (int i = 0; i < epsilon.length(); i++) {
@@ -291,6 +236,8 @@ class Simplex implements Algorithm {
             System.out.print("Minimum ");
         }
         System.out.printf("value of the objective function " + approximation, solution);
+        System.out.println();
+
     }
 
     void setNonBasicVariables() {
@@ -463,12 +410,11 @@ class InteriorPoint implements Algorithm {
 
     Vector startingPoint;
 
+    Vector startingPoint1;
+
     double alpha1 = 0.5;
 
     double alpha2 = 0.9;
-
-    double solution;
-
 
     public InteriorPoint() {
         optimize = "MAX";
@@ -477,86 +423,105 @@ class InteriorPoint implements Algorithm {
         epsilon = "";
     }
 
-    public Vector getStartingPoint() {
-        startingPoint = VectorFactory.createZeroVector(numberOfVariablesN);
-        Random random = new Random();
+    public void setStartingPoint() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the starting point for Interior Point Algorithm:");
+        this.startingPoint = VectorFactory.createVectorFromInput(numberOfVariablesN, scanner);
+        this.startingPoint1 = startingPoint;
 
-        while (true) {
-            for (int i = 0; i < numberOfVariablesN - numberOfConstraintsM; i++) {
-                int intValue = random.nextInt(500); // Adjust the range as needed
-                double doubleValue = random.nextDouble();
-                startingPoint.setItem(i, (double) intValue+doubleValue);
-            }
-            for (int i = numberOfVariablesN - numberOfConstraintsM; i < numberOfVariablesN; i++) {
-                startingPoint.setItem(i, 1.0);
-            }
-            startingPoint.print();
-            if (A.multiplyByVector(startingPoint).equals(b)) {
-                if (startingPoint.getNumberOfZeroElements() < 2) {
-                    break;
-                }
+        for(int i = 0; i < startingPoint.getLength(); i++){
+            if(startingPoint.getItem(i) < 0){
+                System.out.println("The starting point is incorrect! The method is not applicable!");
+                System.exit(0);
             }
         }
-
-        return startingPoint;
     }
 
-    public Vector setStartingPoint(double[] startingPoint) {
-        this.startingPoint = VectorFactory.createVector(startingPoint);
-        return this.startingPoint;
+    public boolean checkApplicability() {
+        if (c.getNumberOfZeroElements() == c.getLength()) {
+            System.out.println("The method is not applicable!");
+            return false;
+        }
+        for (int i = 0; i < b.getLength(); i++) {
+            if (b.getItem(i) < 0) {
+                System.out.println("The method is not applicable!");
+                return false;
+            }
+        }
+        return true;
     }
 
-    public void solve() {
+    public void solveAlpha1() {
         if (optimize.equals("MIN") || optimize.equals("min")) {
             c = c.scalarMultiply(-1);
         }
 
         int iteration = 0;
         while (true) {
-            Vector temp = startingPoint;
-            Matrix D = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
-            D.seatDiagonal(startingPoint);
+            try {
+                Vector temp = startingPoint;
+                Matrix D = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+                D.seatDiagonal(startingPoint);
 
-            Matrix Anew = A.multiply(D);
+                Matrix Anew = A.multiply(D);
 
-            Matrix AnewT = Anew.transpose();
+                Matrix AnewT = Anew.transpose();
 
-            Vector Cnew = D.multiplyByVector(c);
+                Vector Cnew = D.multiplyByVector(c);
 
-            Matrix I = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+                Matrix I = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
 
-            Matrix F = Anew.multiply(AnewT);
+                Matrix F = Anew.multiply(AnewT);
 
-            Matrix FI = Inverser.calculateInverse(F);
+                Matrix FI = Inverser.calculateInverse(F);
 
-            Matrix H = AnewT.multiply(FI);
+                Matrix H = AnewT.multiply(FI);
 
-            Matrix P = I.minus(H.multiply(Anew));
+                Matrix P = I.minus(H.multiply(Anew));
 
-            Vector cp = P.multiplyByVector(Cnew);
+                Vector cp = P.multiplyByVector(Cnew);
 
-            double nu = Math.abs(cp.findMinValue());
+                double nu = Math.abs(cp.findMinValue());
 
-            Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
+                Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
 
-            Vector result = ones.plus(cp.scalarMultiply(alpha1 / nu));
+                Vector result = ones.plus(cp.scalarMultiply(alpha1 / nu));
 
-            result = D.multiplyByVector(result);
+                result = D.multiplyByVector(result);
 
-            startingPoint = result;
+                startingPoint = result;
 
-//            System.out.println("In iteration " + iteration + " we have x* = [");
-//            startingPoint.print();
-//            System.out.println("]");
-            iteration++;
+                iteration++;
+                if(iteration == 1000){
+                    System.out.println("The problem does not have solution! OR The starting point is incorrect!");
+                    System.exit(0);
+                }
 
-            if (result.minus(temp).getNorm() < Double.parseDouble(epsilon)) {
-                break;
+                if (result.minus(temp).getNorm() < Double.parseDouble(epsilon)) {
+                    break;
+                }
+            } catch (Exception ex) {
+                System.out.println("The problem does not have solution! OR The starting point is incorrect!");
+                return;
             }
         }
-        System.out.println("The solution by Interior Point method Algorithm:");
-        System.out.println("In the last iteration " + iteration + " we have x* = {");
-        startingPoint.print();
+        System.out.println("The solution by Interior Point method Algorithm with alpha1 = 0.5:");
+        int signs = 0;
+        boolean afterComma = false;
+        for (int i = 0; i < epsilon.length(); i++) {
+            if (epsilon.charAt(i) == '.' || epsilon.charAt(i) == ',') {
+                afterComma = true;
+            }
+            if (afterComma && epsilon.charAt(i) >= '0' && epsilon.charAt(i) <= '9') {
+                signs++;
+            }
+        }
+        String approximation = "%." + signs + "f ";
+        System.out.printf("In the last iteration " + iteration + " we have x* = { ");
+        for (double x : startingPoint
+        ) {
+            System.out.printf(approximation, x);
+        }
         System.out.println("}");
         // Calculate the solution
         if (optimize.equalsIgnoreCase("max")) {
@@ -565,7 +530,87 @@ class InteriorPoint implements Algorithm {
         if (optimize.equalsIgnoreCase("min")) {
             System.out.print("Minimum ");
         }
-        System.out.printf("value of the objective function " + c.dotProduct(startingPoint));
+        System.out.printf("value of the objective function " + approximation, c.dotProduct(startingPoint));
+        System.out.println();
+    }
+
+    public void solveAlpha2() {
+        int iteration = 0;
+        while (true) {
+            try {
+                Vector temp = startingPoint1;
+                Matrix D = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+                D.seatDiagonal(startingPoint1);
+
+                Matrix Anew = A.multiply(D);
+
+                Matrix AnewT = Anew.transpose();
+
+                Vector Cnew = D.multiplyByVector(c);
+
+                Matrix I = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+
+                Matrix F = Anew.multiply(AnewT);
+
+                Matrix FI = Inverser.calculateInverse(F);
+
+                Matrix H = AnewT.multiply(FI);
+
+                Matrix P = I.minus(H.multiply(Anew));
+
+                Vector cp = P.multiplyByVector(Cnew);
+
+                double nu = Math.abs(cp.findMinValue());
+
+                Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
+
+                Vector result = ones.plus(cp.scalarMultiply(alpha2 / nu));
+
+                result = D.multiplyByVector(result);
+
+                startingPoint1 = result;
+
+                iteration++;
+                if(iteration == 1000){
+                    System.out.println("The problem does not have solution! OR The starting point is incorrect!");
+                    System.exit(0);
+                }
+
+                if (result.minus(temp).getNorm() < Double.parseDouble(epsilon)) {
+                    break;
+                }
+            } catch (Exception ex) {
+                System.out.println("The problem does not have solution! OR The starting point is incorrect!");
+                return;
+            }
+        }
+        System.out.println("The solution by Interior Point method Algorithm with alpha = 0.9:");
+        int signs = 0;
+        boolean afterComma = false;
+        for (int i = 0; i < epsilon.length(); i++) {
+            if (epsilon.charAt(i) == '.' || epsilon.charAt(i) == ',') {
+                afterComma = true;
+            }
+            if (afterComma && epsilon.charAt(i) >= '0' && epsilon.charAt(i) <= '9') {
+                signs++;
+            }
+        }
+        String approximation = "%." + signs + "f ";
+        System.out.printf("In the last iteration " + iteration + " we have x* = { ");
+        for (double x : startingPoint1
+        ) {
+            System.out.printf(approximation, x);
+        }
+        System.out.println("}");
+        // Calculate the solution
+        if (optimize.equalsIgnoreCase("max")) {
+            System.out.print("Maximum ");
+        }
+        if (optimize.equalsIgnoreCase("min")) {
+            System.out.print("Minimum ");
+        }
+        System.out.printf("value of the objective function " + approximation, c.dotProduct(startingPoint1));
+        System.out.println();
     }
 
 
