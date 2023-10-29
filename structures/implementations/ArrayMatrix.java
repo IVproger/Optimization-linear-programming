@@ -167,4 +167,39 @@ public class ArrayMatrix implements Matrix {
         for (int i = 0; i < this.rows; i++)
             this.values[i][col] = vector.getItem(i);
     }
+
+    @Override
+    public void print() {
+        for (int i = 0; i < this.rows; i++) {
+            System.out.print("| ");
+
+            for (int j = 0; j < this.cols; j++)
+                System.out.printf("%f ", this.values[i][j]);
+
+            System.out.println("|");
+        }
+    }
+
+    @Override
+    public void seatDiagonal(Vector vector) {
+        if (vector.getLength() != this.rows)
+            throw new IllegalArgumentException();
+
+        for (int i = 0; i < this.rows; i++)
+            this.values[i][i] = vector.getItem(i);
+    }
+
+    @Override
+    public Matrix transpose() {
+        Matrix result = new ArrayMatrix(this.cols, this.rows);
+
+        for (int i = 0; i < this.cols; i++)
+            for (int j = 0; j < this.rows; j++)
+                result.setItem(i, j, this.values[j][i]);
+
+        return result;
+    }
+
+
+
 }

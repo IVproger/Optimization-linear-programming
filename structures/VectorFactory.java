@@ -27,4 +27,22 @@ public class VectorFactory {
 
         return vector;
     }
+
+    public static Vector createZeroVector(int length) {
+        Vector vector = new ArrayVector(length);
+
+        for (int i = 0; i < length; i++)
+            vector.setItem(i, 0);
+
+        return vector;
+    }
+
+    public static Vector createOnesVector(int length) {
+        Vector vector = new ArrayVector(length);
+
+        for (int i = 0; i < length; i++)
+            vector.setItem(i, 1);
+
+        return vector;
+    }
 }

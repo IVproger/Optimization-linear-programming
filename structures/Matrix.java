@@ -24,4 +24,10 @@ public interface Matrix {
     void setItem(int row, int col, double value);
     void setRow(int row, Vector vector);
     void setColumn(int col, Vector vector);
+
+    void print();
+
+    void seatDiagonal(Vector vector);
+
+    Matrix transpose();
 }

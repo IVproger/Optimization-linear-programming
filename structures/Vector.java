@@ -13,4 +13,13 @@ public interface Vector extends Iterable<Double> {
 
     int getLength();
 
+    void print();
+
+    boolean equals(Vector other);
+
+    double getNorm();
+
+    int getNumberOfZeroElements();
+
+    double findMinValue();
 }

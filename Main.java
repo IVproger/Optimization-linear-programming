@@ -4,20 +4,97 @@ import structures.Vector;
 import structures.Matrix;
 import structures.Inverser;
 
+import java.util.Random;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+
+interface Algorithm {
+
+}
 
 public class Main {
     public static void main(String[] args) {
-        Simplex simplex = input();
-        if (simplex == null) return;
+//        ArrayList<Algorithm> algorithms = input();
+//        if(algorithms == null) return;
+//        Simplex simplex = (Simplex) algorithms.get(0);
+//        InteriorPoint interiorPoint = (InteriorPoint) algorithms.get(1);
+//
+//        if (simplex == null) return;
+//        if (simplex.checkApplicability() != 1) {
+//            simplex.iteration0();
+//            simplex.goRevisedSimplex();
+//        }
 
-        if (simplex.checkApplicability() != 1) {
-            simplex.iteration0();
-            simplex.goRevisedSimplex();
-        }
+        // TODO check the methods applicability and if they are applicable, then solve the problem
+        // TODO find algorithm to find the starting point for Interior Point method
+        // TODO clean code and add comments
+        // TODO push into GitHub
+        // TODO add README.md
+
+
+        // Test 1
+        InteriorPoint interiorPoint = InteriorPoint.builder()
+                .setOptimize("max")
+                .setNumberOfVariablesN(6)
+                .setNumberOfConstraintsM(3)
+                .setVectorC(VectorFactory.createVector(new double[]{9, 10, 16, 0, 0, 0}))
+                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{18, 15, 12, 1, 0, 0}, {6, 4, 8, 0, 1, 0}, {5, 3, 3, 0, 0, 1}}))
+                .setVectorB(VectorFactory.createVector(new double[]{360, 192, 180}))
+                .setEpsilon("0.0001")
+                .build();
+
+//        interiorPoint.setStartingPoint(new double[]{1, 1, 1, 315, 174, 169});
+        interiorPoint.getStartingPoint();
+        interiorPoint.startingPoint.print();
+
+
+
+
+
+//        interiorPoint.solve();
+//
+//        System.out.println("\n\n");
+//        Simplex simplex = Simplex.builder()
+//                .setOptimize("max")
+//                .setNumberOfVariablesN(6)
+//                .setNumberOfConstraintsM(3)
+//                .setVectorC(VectorFactory.createVector(new double[]{9, 10, 16, 0, 0, 0}))
+//                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{18, 15, 12, 1, 0, 0}, {6, 4, 8, 0, 1, 0}, {5, 3, 3, 0, 0, 1}}))
+//                .setVectorB(VectorFactory.createVector(new double[]{360, 192, 180}))
+//                .setEpsilon("0.0001")
+//                .build();
+//        if (simplex == null) return;
+//        if (simplex.checkApplicability() != 1) {
+//            simplex.iteration0();
+//            simplex.goRevisedSimplex();
+//        }
+
+
+
+
+
+
+        // Test 2
+//        InteriorPoint interiorPoint = InteriorPoint.builder()
+//                .setOptimize("max")
+//                .setNumberOfVariablesN(4)
+//                .setNumberOfConstraintsM(2)
+//                .setVectorC(VectorFactory.createVector(new double[]{1, 1, 0, 0}))
+//                .setMatrixA(MatrixFactory.createMatrix(new double[][]{{2, 4, 1, 0}, {1, 3, 0, -1}}))
+//                .setVectorB(VectorFactory.createVector(new double[]{16, 9}))
+//                .setEpsilon("0.0001")
+//                .build();
+//
+//        interiorPoint.setStartingPoint(new double[]{0.5, 3.5, 1, 2});
+//
+//        interiorPoint.solve();
+
+
     }
 
-    private static Simplex input() {
+    private static ArrayList<Algorithm> input() {
+        ArrayList<Algorithm> algorithms = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
         try {
@@ -41,7 +118,8 @@ public class Main {
             System.out.println("Enter an approximation accuracy - epsilon.");
             String e = scanner.next();
 
-            return Simplex.builder()
+
+            algorithms.add(Simplex.builder()
                     .setOptimize(opt)
                     .setNumberOfVariablesN(n)
                     .setNumberOfConstraintsM(m)
@@ -49,7 +127,20 @@ public class Main {
                     .setMatrixA(A)
                     .setVectorB(b)
                     .setEpsilon(e)
-                    .build();
+                    .build());
+
+            algorithms.add(InteriorPoint.builder()
+                    .setOptimize(opt)
+                    .setNumberOfVariablesN(n)
+                    .setNumberOfConstraintsM(m)
+                    .setVectorC(c)
+                    .setMatrixA(A)
+                    .setVectorB(b)
+                    .setEpsilon(e)
+                    .build());
+
+
+            return algorithms;
         } catch (Exception ex) {
             System.out.println("Wrong input!");
             return null;
@@ -58,7 +149,7 @@ public class Main {
 
 }
 
-class Simplex {
+class Simplex implements Algorithm {
     String optimize; // MAX or MIN
     int numberOfVariablesN;
     int numberOfConstraintsM;
@@ -175,6 +266,7 @@ class Simplex {
         for (int i = 0; i < basisIndexes.getLength(); i++) {
             xSolution.setItem((int) basisIndexes.getItem(i), xBasis.getItem(i));
         }
+        System.out.println("The solution by Simplex method Algorithm:");
         System.out.print("A vector of decision variables - x* = {");
         int signs = 0;
         boolean afterComma = false;
@@ -358,7 +450,183 @@ class Simplex {
     public static Builder builder() {
         return new Builder();
     }
-
-
 }
 
+class InteriorPoint implements Algorithm {
+    String optimize; // MAX or MIN
+    int numberOfVariablesN;
+    int numberOfConstraintsM;
+    Vector c; // (N)
+    Matrix A; // (M*N)
+    Vector b; // (M)
+    String epsilon; // approximation accuracy
+
+    Vector startingPoint;
+
+    double alpha1 = 0.5;
+
+    double alpha2 = 0.9;
+
+    double solution;
+
+
+    public InteriorPoint() {
+        optimize = "MAX";
+        numberOfVariablesN = 0;
+        numberOfConstraintsM = 0;
+        epsilon = "";
+    }
+
+    public Vector getStartingPoint() {
+        startingPoint = VectorFactory.createZeroVector(numberOfVariablesN);
+        Random random = new Random();
+
+        while (true) {
+            for (int i = 0; i < numberOfVariablesN - numberOfConstraintsM; i++) {
+                int intValue = random.nextInt(500); // Adjust the range as needed
+                double doubleValue = random.nextDouble();
+                startingPoint.setItem(i, (double) intValue+doubleValue);
+            }
+            for (int i = numberOfVariablesN - numberOfConstraintsM; i < numberOfVariablesN; i++) {
+                startingPoint.setItem(i, 1.0);
+            }
+            startingPoint.print();
+            if (A.multiplyByVector(startingPoint).equals(b)) {
+                if (startingPoint.getNumberOfZeroElements() < 2) {
+                    break;
+                }
+            }
+        }
+
+        return startingPoint;
+    }
+
+    public Vector setStartingPoint(double[] startingPoint) {
+        this.startingPoint = VectorFactory.createVector(startingPoint);
+        return this.startingPoint;
+    }
+
+    public void solve() {
+        if (optimize.equals("MIN") || optimize.equals("min")) {
+            c = c.scalarMultiply(-1);
+        }
+
+        int iteration = 0;
+        while (true) {
+            Vector temp = startingPoint;
+            Matrix D = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+            D.seatDiagonal(startingPoint);
+
+            Matrix Anew = A.multiply(D);
+
+            Matrix AnewT = Anew.transpose();
+
+            Vector Cnew = D.multiplyByVector(c);
+
+            Matrix I = MatrixFactory.createIdentityMatrix(numberOfVariablesN);
+
+            Matrix F = Anew.multiply(AnewT);
+
+            Matrix FI = Inverser.calculateInverse(F);
+
+            Matrix H = AnewT.multiply(FI);
+
+            Matrix P = I.minus(H.multiply(Anew));
+
+            Vector cp = P.multiplyByVector(Cnew);
+
+            double nu = Math.abs(cp.findMinValue());
+
+            Vector ones = VectorFactory.createOnesVector(numberOfVariablesN);
+
+            Vector result = ones.plus(cp.scalarMultiply(alpha1 / nu));
+
+            result = D.multiplyByVector(result);
+
+            startingPoint = result;
+
+//            System.out.println("In iteration " + iteration + " we have x* = [");
+//            startingPoint.print();
+//            System.out.println("]");
+            iteration++;
+
+            if (result.minus(temp).getNorm() < Double.parseDouble(epsilon)) {
+                break;
+            }
+        }
+        System.out.println("The solution by Interior Point method Algorithm:");
+        System.out.println("In the last iteration " + iteration + " we have x* = {");
+        startingPoint.print();
+        System.out.println("}");
+        // Calculate the solution
+        if (optimize.equalsIgnoreCase("max")) {
+            System.out.print("Maximum ");
+        }
+        if (optimize.equalsIgnoreCase("min")) {
+            System.out.print("Minimum ");
+        }
+        System.out.printf("value of the objective function " + c.dotProduct(startingPoint));
+    }
+
+
+    public static class Builder {
+        private String optimize; // MAX or MIN
+        private int numberOfVariablesN;
+        private int numberOfConstraintsM;
+        private Vector c; // (N)
+        private Matrix A; // (M*N)
+        private Vector b; // (M)
+        private String epsilon; // approximation accuracy
+
+        InteriorPoint.Builder setOptimize(String optimize) {
+            this.optimize = optimize;
+            return this;
+        }
+
+        InteriorPoint.Builder setNumberOfVariablesN(int numberOfVariablesN) {
+            this.numberOfVariablesN = numberOfVariablesN;
+            return this;
+        }
+
+        InteriorPoint.Builder setNumberOfConstraintsM(int numberOfConstraintsM) {
+            this.numberOfConstraintsM = numberOfConstraintsM;
+            return this;
+        }
+
+        InteriorPoint.Builder setVectorC(Vector c) {
+            this.c = c;
+            return this;
+        }
+
+        InteriorPoint.Builder setMatrixA(Matrix A) {
+            this.A = A;
+            return this;
+        }
+
+        InteriorPoint.Builder setVectorB(Vector b) {
+            this.b = b;
+            return this;
+        }
+
+        InteriorPoint.Builder setEpsilon(String e) {
+            this.epsilon = e;
+            return this;
+        }
+
+        public InteriorPoint build() {
+            InteriorPoint interiorPoint = new InteriorPoint();
+            interiorPoint.optimize = this.optimize;
+            interiorPoint.numberOfVariablesN = this.numberOfVariablesN;
+            interiorPoint.numberOfConstraintsM = this.numberOfConstraintsM;
+            interiorPoint.A = this.A;
+            interiorPoint.c = this.c;
+            interiorPoint.b = this.b;
+            interiorPoint.epsilon = this.epsilon;
+            return interiorPoint;
+        }
+    }
+
+    public static InteriorPoint.Builder builder() {
+        return new InteriorPoint.Builder();
+    }
+}

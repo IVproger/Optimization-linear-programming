@@ -117,4 +117,56 @@ public class ArrayVector implements Vector {
             }
         };
     }
+
+    @Override
+    public void print() {
+        for (int i = 0; i < this.length; i++)
+            System.out.print(this.values[i] + " ");
+        System.out.println();
+    }
+
+    @Override
+    public boolean equals(Vector other) {
+        if (this.length != other.getLength())
+            return false;
+
+        for (int i = 0; i < this.length; i++)
+            if (this.values[i] != other.getItem(i))
+                return false;
+
+        return true;
+    }
+
+    @Override
+    public double getNorm() {
+        double sum = 0;
+
+        for (int i = 0; i < this.length; i++)
+            sum += this.values[i] * this.values[i];
+
+        return Math.sqrt(sum);
+    }
+
+    @Override
+    public int getNumberOfZeroElements() {
+        int count = 0;
+
+        for (int i = 0; i < this.length; i++)
+            if (this.values[i] == 0)
+                count++;
+
+        return count;
+    }
+
+    @Override
+    public double findMinValue() {
+        double min = 1000000000;
+
+        for (int i = 0; i < this.length; i++)
+            if (this.values[i] < min)
+                min = this.values[i];
+
+        return min;
+    }
+
 }
