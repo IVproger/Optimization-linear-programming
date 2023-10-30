@@ -3,15 +3,10 @@ import structures.MatrixFactory;
 import structures.Vector;
 import structures.Matrix;
 import structures.Inverser;
-
-import java.nio.file.SecureDirectoryStream;
-import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-interface Algorithm {
-
-}
+interface Algorithm {}
 
 public class Main {
     public static void main(String[] args) {
