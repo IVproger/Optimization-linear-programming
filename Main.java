@@ -508,6 +508,10 @@ class InteriorPoint implements Algorithm {
      */
     public void solveAlpha(double alpha) {
         //Change vector c if it is a minimization problem
+        if(alpha == 0.9 && optimize.equalsIgnoreCase("min")){
+            // Set c to default
+            c = c.scalarMultiply(-1);
+        }
         if (optimize.equalsIgnoreCase("min")) {
             c = c.scalarMultiply(-1);
         }
